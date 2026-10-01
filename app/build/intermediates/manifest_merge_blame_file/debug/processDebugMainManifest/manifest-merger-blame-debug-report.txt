@@ -1,0 +1,44 @@
+1<?xml version="1.0" encoding="utf-8"?>
+2<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+3    package="id.sdn6sibetan.absen"
+4    android:versionCode="1"
+5    android:versionName="1.0" >
+6
+7    <uses-sdk
+8        android:minSdkVersion="29"
+9        android:targetSdkVersion="34" />
+10
+11    <application
+11-->C:\Users\ADVAN\Desktop\baru absen\AbsenSiswa\AbsenSiswa\app\src\main\AndroidManifest.xml:3:5-7:19
+12        android:allowBackup="true"
+12-->C:\Users\ADVAN\Desktop\baru absen\AbsenSiswa\AbsenSiswa\app\src\main\AndroidManifest.xml:3:46-72
+13        android:debuggable="true"
+14        android:extractNativeLibs="false"
+15        android:icon="@android:drawable/ic_menu_agenda"
+15-->C:\Users\ADVAN\Desktop\baru absen\AbsenSiswa\AbsenSiswa\app\src\main\AndroidManifest.xml:3:142-189
+16        android:label="Absen Siswa"
+16-->C:\Users\ADVAN\Desktop\baru absen\AbsenSiswa\AbsenSiswa\app\src\main\AndroidManifest.xml:3:18-45
+17        android:theme="@android:style/Theme.DeviceDefault.Light.NoActionBar" >
+17-->C:\Users\ADVAN\Desktop\baru absen\AbsenSiswa\AbsenSiswa\app\src\main\AndroidManifest.xml:3:73-141
+18        <activity
+18-->C:\Users\ADVAN\Desktop\baru absen\AbsenSiswa\AbsenSiswa\app\src\main\AndroidManifest.xml:4:9-6:20
+19            android:name="id.sdn6sibetan.absen.MainActivity"
+19-->C:\Users\ADVAN\Desktop\baru absen\AbsenSiswa\AbsenSiswa\app\src\main\AndroidManifest.xml:4:19-47
+20            android:configChanges="orientation|screenSize|keyboardHidden"
+20-->C:\Users\ADVAN\Desktop\baru absen\AbsenSiswa\AbsenSiswa\app\src\main\AndroidManifest.xml:4:72-133
+21            android:exported="true" >
+21-->C:\Users\ADVAN\Desktop\baru absen\AbsenSiswa\AbsenSiswa\app\src\main\AndroidManifest.xml:4:48-71
+22            <intent-filter>
+22-->C:\Users\ADVAN\Desktop\baru absen\AbsenSiswa\AbsenSiswa\app\src\main\AndroidManifest.xml:5:13-154
+23                <action android:name="android.intent.action.MAIN" />
+23-->C:\Users\ADVAN\Desktop\baru absen\AbsenSiswa\AbsenSiswa\app\src\main\AndroidManifest.xml:5:28-79
+23-->C:\Users\ADVAN\Desktop\baru absen\AbsenSiswa\AbsenSiswa\app\src\main\AndroidManifest.xml:5:36-77
+24
+25                <category android:name="android.intent.category.LAUNCHER" />
+25-->C:\Users\ADVAN\Desktop\baru absen\AbsenSiswa\AbsenSiswa\app\src\main\AndroidManifest.xml:5:79-138
+25-->C:\Users\ADVAN\Desktop\baru absen\AbsenSiswa\AbsenSiswa\app\src\main\AndroidManifest.xml:5:89-136
+26            </intent-filter>
+27        </activity>
+28    </application>
+29
+30</manifest>

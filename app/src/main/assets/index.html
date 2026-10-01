@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="id"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#1f5fbf"><title>Absen Siswa</title>
+<style>
+:root{--bg:#f4f6fb;--card:#fff;--tx:#1b2430;--mu:#667085;--pr:#1f5fbf;--bd:#dde3ee;--H:#2e9e5b;--S:#e0a100;--I:#2f7fd1;--A:#d64545}
+@media(prefers-color-scheme:dark){:root{--bg:#10151d;--card:#1a212c;--tx:#e8edf5;--mu:#95a1b3;--bd:#2b3544;--pr:#5b95ee}}
+*{box-sizing:border-box}body{margin:0;font:15px/1.4 system-ui,sans-serif;background:var(--bg);color:var(--tx);padding-bottom:72px}
+header{background:var(--pr);color:#fff;padding:14px 16px;position:sticky;top:0;z-index:5}
+header h1{margin:0;font-size:18px}header small{opacity:.85}
+main{padding:12px;max-width:900px;margin:auto}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:12px;margin-bottom:12px}
+nav{position:fixed;bottom:0;left:0;right:0;display:flex;background:var(--card);border-top:1px solid var(--bd);z-index:6}
+nav button{flex:1;border:0;background:none;color:var(--mu);padding:10px 2px;font-size:12px}
+nav button.on{color:var(--pr);font-weight:700}nav button span{display:block;font-size:20px}
+input,select,textarea{width:100%;padding:10px;border:1px solid var(--bd);border-radius:8px;background:var(--card);color:var(--tx);font:inherit}
+label{font-size:12px;color:var(--mu);display:block;margin:8px 0 3px}
+.btn{border:0;background:var(--pr);color:#fff;padding:10px 14px;border-radius:8px;font:inherit;font-weight:600}
+.btn.g{background:var(--bd);color:var(--tx)}.btn.r{background:var(--A)}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.row>*{flex:1}
+.stu{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--bd)}
+.stu:last-child{border:0}.no{width:24px;color:var(--mu)}.nm{flex:1;min-width:0}.nm b{display:block;overflow:hidden;text-overflow:ellipsis}
+.nm small{color:var(--mu)}
+.sg{display:flex;gap:4px}.sg button{width:40px;height:40px;border-radius:8px;border:1px solid var(--bd);background:var(--card);color:var(--tx);font-weight:700}
+.sg button.on[data-s=H]{background:var(--H);color:#fff;border-color:var(--H)}.sg button.on[data-s=S]{background:var(--S);color:#fff;border-color:var(--S)}
+.sg button.on[data-s=I]{background:var(--I);color:#fff;border-color:var(--I)}.sg button.on[data-s=A]{background:var(--A);color:#fff;border-color:var(--A)}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}.chip{padding:4px 10px;border-radius:99px;font-size:13px;font-weight:600;color:#fff}
+.tw{overflow:auto}table{border-collapse:collapse;width:100%;font-size:12px}th,td{border:1px solid var(--bd);padding:4px 5px;text-align:center;white-space:nowrap}
+th{background:var(--bg)}td.l{text-align:left}td.H{color:var(--H)}td.S{color:var(--S);font-weight:700}td.I{color:var(--I);font-weight:700}td.A{color:var(--A);font-weight:700}td.off{background:var(--bg)}
+.hide{display:none}.empty{color:var(--mu);text-align:center;padding:20px}
+dialog{border:0;border-radius:14px;padding:16px;width:min(560px,94vw);background:var(--card);color:var(--tx);max-height:90vh}
+dialog::backdrop{background:#0008}
+.toast{position:fixed;left:50%;bottom:84px;transform:translateX(-50%);background:#222;color:#fff;padding:8px 14px;border-radius:99px;z-index:20;font-size:13}
+</style></head><body>
+<header><h1>Absen Siswa</h1><small id="sub"></small></header>
+<main>
+<section id="p-absen">
+ <div class="card"><div class="row"><div><label>Tanggal</label><input type="date" id="tgl"></div>
+ <div><label>Cari siswa</label><input id="cari" placeholder="Nama..."></div></div>
+ <div class="row" style="margin-top:8px"><button class="btn g" id="semuaH">Semua Hadir</button><button class="btn g" id="reset">Kosongkan</button></div>
+ <div class="chips" id="sum"></div></div>
+ <div class="card" id="list"></div>
+</section>
+<section id="p-siswa" class="hide">
+ <div class="row" style="margin-bottom:10px"><button class="btn" id="tambah">+ Tambah Siswa</button></div><div class="row" style="margin-bottom:10px"><button class="btn" id="cetakSiswa">🖨 Cetak / PDF</button><button class="btn" id="docSiswa">📄 Word</button><button class="btn" id="xlsSiswa">📗 Excel</button><button class="btn g" id="csvSiswa">CSV</button></div>
+ <div class="card" id="dsiswa"></div>
+</section>
+<section id="p-rekap" class="hide">
+ <div class="card"><div class="row"><div><label>Jenis rekap</label><select id="jr"><option value="bln">Bulanan (per tanggal)</option><option value="sem">Per semester</option><option value="thn">Tahun ajaran</option></select></div>
+ <div id="wb"><label>Bulan</label><input type="month" id="bln"></div>
+ <div id="ws" class="hide"><label>Semester</label><select id="sem"><option value="1">Semester 1 (Jul-Des)</option><option value="2">Semester 2 (Jan-Jun)</option></select></div></div>
+ <div class="row" style="margin-top:8px"><button class="btn" id="cetak">🖨 Cetak / PDF</button><button class="btn" id="docRekap">📄 Dokumen Word</button><button class="btn" id="xlsRekap">📗 Excel</button><button class="btn g" id="csvRekap">CSV</button></div></div>
+ <div class="card tw" id="rekap"></div>
+</section>
+<section id="p-set" class="hide">
+ <div class="card"><b>Identitas Kelas</b>
+ <label>Sekolah</label><input id="sSek"><label>Kelas</label><input id="sKel"><label>Tahun ajaran</label><input id="sTa">
+ <label>Wali kelas / guru</label><input id="sGuru"><label>NIP guru</label><input id="sNip">
+ <label>Kepala sekolah</label><input id="sKep"><label>NIP kepala sekolah</label><input id="sNipK">
+ <p><button class="btn" id="simpanSet">Simpan</button></p></div>
+ <div class="card"><b>Cadangan Data</b><p style="color:var(--mu);margin:4px 0 8px">Data tersimpan di perangkat ini. Buat cadangan berkala dan simpan di tempat aman.</p>
+ <div class="row"><button class="btn" id="bak">Simpan Cadangan (JSON)</button><button class="btn g" id="res">Pulihkan Cadangan</button></div>
+ <input type="file" id="fres" accept=".json,application/json" class="hide"></div>
+</section>
+</main>
+<nav><button data-p="absen" class="on"><span>✔</span>Absen</button><button data-p="siswa"><span>👥</span>Siswa</button><button data-p="rekap"><span>📊</span>Rekap</button><button data-p="set"><span>⚙</span>Pengaturan</button></nav>
+<dialog id="dlg"><form method="dialog" id="f"><b id="dt">Data Siswa</b>
+ <div class="row"><div><label>NIS</label><input name="nis"></div><div><label>NISN</label><input name="nisn" inputmode="numeric"></div></div>
+ <label>Nama lengkap *</label><input name="nama" required>
+ <div class="row"><div><label>Jenis kelamin</label><select name="jk"><option value="L">Laki-laki</option><option value="P">Perempuan</option></select></div>
+ <div><label>Agama</label><select name="agama"><option>Hindu</option><option>Islam</option><option>Kristen</option><option>Katolik</option><option>Buddha</option><option>Konghucu</option></select></div></div>
+ <div class="row"><div><label>Tempat lahir</label><input name="tmp"></div><div><label>Tanggal lahir</label><input type="date" name="tgllhr"></div></div>
+ <label>Alamat</label><textarea name="alamat" rows="2"></textarea>
+ <div class="row"><div><label>Nama ayah</label><input name="ayah"></div><div><label>Nama ibu</label><input name="ibu"></div></div>
+ <div class="row"><div><label>Pekerjaan orang tua</label><input name="kerja"></div><div><label>No. HP orang tua</label><input name="hp" inputmode="tel"></div></div>
+ <label>Catatan (alergi, kondisi khusus)</label><input name="cat">
+ <div class="row" style="margin-top:12px"><button class="btn" value="ok">Simpan</button><button class="btn g" value="x" formnovalidate>Batal</button><button class="btn r" type="button" id="hapus">Hapus</button></div>
+</form></dialog>
+<script>
+const KEY='absen_siswa_v1';
+const SEED=['I KADEK AGUS ARYA WIGUNA','NI KADEK AMI APRIANI','I PUTU ANGGA DEVA MAHENDRA','I PUTU ANATA KUSUMA NEGARA','NI KADEK DIVIRA SENJANITHA','I MADE GEMILANG ANGGA KUSUMA','NI PUTU HANAYUSHA ISWARI','NI KADEK ICHA SEPTYANTARI','I KOMANG YUDI ADNYANA','I GEDE AKSARA ARIS MANTRA','I KADEK EBY ANANDA RASTA'];
+const uid=()=>Math.random().toString(36).slice(2,10);
+let DB;
+try{DB=JSON.parse(localStorage.getItem(KEY))}catch(e){}
+if(!DB||!DB.siswa){DB={set:{sek:'SDN 6 Sibetan',kel:'IV (Empat)',ta:'2026/2027',guru:'I Made Agus Kurniawan Putra, S.Pd.SD',nip:'198308152009021004',kep:'I Gusti Ngurah Suarsana, S.Pd.SD',nipk:'197206281996061002'},
+ siswa:SEED.map((n,i)=>({id:uid(),nis:'',nisn:'',nama:n,jk:/^(NI|NI )/.test(n)?'P':'L',agama:'Hindu'})),abs:{}}}
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(DB))}catch(e){toast('Gagal menyimpan')}};
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function toast(t){const e=document.createElement('div');e.className='toast';e.textContent=t;document.body.append(e);setTimeout(()=>e.remove(),1800)}
+const iso=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+const BLN=['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+const HARI=['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
+const sorted=()=>DB.siswa.slice().sort((a,b)=>a.nama.localeCompare(b.nama));
+const sortedList=()=>DB.siswa; // urutan input = nomor absen
+$('#tgl').value=iso(new Date());$('#bln').value=iso(new Date()).slice(0,7);
+function head(){const s=DB.set;$('#sub').textContent=`${s.sek} · Kelas ${s.kel} · TA ${s.ta}`}
+// nav
+$$('nav button').forEach(b=>b.onclick=()=>{$$('nav button').forEach(x=>x.classList.toggle('on',x===b));['absen','siswa','rekap','set'].forEach(p=>$('#p-'+p).classList.toggle('hide',p!==b.dataset.p));render()});
+function render(){head();rAbsen();rSiswa();rRekap();loadSet()}
+// absen
+function rAbsen(){const t=$('#tgl').value,q=$('#cari').value.toLowerCase(),day=DB.abs[t]||{};
+ const d=new Date(t+'T00:00');$('#list').previousElementSibling.querySelector('label').textContent=`Tanggal (${isNaN(d)?'':HARI[d.getDay()]})`;
+ const c={H:0,S:0,I:0,A:0,N:0};DB.siswa.forEach(s=>{const v=day[s.id];v?c[v]++:c.N++});
+ $('#sum').innerHTML=[['H','Hadir'],['S','Sakit'],['I','Izin'],['A','Alpa']].map(([k,n])=>`<span class="chip" style="background:var(--${k})">${n} ${c[k]}</span>`).join('')+`<span class="chip" style="background:var(--mu)">Belum ${c.N}</span>`;
+ const L=DB.siswa.map((s,i)=>[s,i]).filter(([s])=>s.nama.toLowerCase().includes(q));
+ $('#list').innerHTML=L.length?L.map(([s,i])=>`<div class="stu"><div class="no">${i+1}</div><div class="nm"><b>${esc(s.nama)}</b><small>${esc(s.nis||'')} ${s.jk==='P'?'P':'L'}</small></div><div class="sg">${['H','S','I','A'].map(k=>`<button data-id="${s.id}" data-s="${k}" class="${day[s.id]===k?'on':''}">${k}</button>`).join('')}</div></div>`).join(''):'<div class="empty">Belum ada siswa. Tambahkan di menu Siswa.</div>'}
+$('#list').onclick=e=>{const b=e.target.closest('button');if(!b)return;const t=$('#tgl').value;if(!t)return;const day=DB.abs[t]=DB.abs[t]||{};
+ if(day[b.dataset.id]===b.dataset.s)delete day[b.dataset.id];else day[b.dataset.id]=b.dataset.s;if(!Object.keys(day).length)delete DB.abs[t];save();rAbsen()};
+$('#tgl').onchange=rAbsen;$('#cari').oninput=rAbsen;
+$('#semuaH').onclick=()=>{const t=$('#tgl').value;const day=DB.abs[t]=DB.abs[t]||{};DB.siswa.forEach(s=>{if(!day[s.id])day[s.id]='H'});save();rAbsen();toast('Yang belum diisi ditandai Hadir')};
+$('#reset').onclick=()=>{if(confirm('Kosongkan absen tanggal ini?')){delete DB.abs[$('#tgl').value];save();rAbsen()}};
+// siswa
+function rSiswa(){$('#dsiswa').innerHTML=DB.siswa.length?DB.siswa.map((s,i)=>`<div class="stu" data-id="${s.id}" style="cursor:pointer"><div class="no">${i+1}</div><div class="nm"><b>${esc(s.nama)}</b><small>NIS ${esc(s.nis||'-')} · NISN ${esc(s.nisn||'-')} · ${s.jk==='P'?'Perempuan':'Laki-laki'}${s.hp?' · '+esc(s.hp):''}</small></div><div>›</div></div>`).join(''):'<div class="empty">Belum ada data siswa.</div>'}
+$('#dsiswa').onclick=e=>{const r=e.target.closest('.stu');if(r)edit(r.dataset.id)};
+$('#tambah').onclick=()=>edit(null);
+let cur=null;
+function edit(id){cur=id;const f=$('#f');f.reset();const s=id?DB.siswa.find(x=>x.id===id):{};
+ for(const el of f.elements)if(el.name&&s[el.name]!=null)el.value=s[el.name];
+ $('#dt').textContent=id?'Ubah Data Siswa':'Tambah Siswa';$('#hapus').style.display=id?'':'none';$('#dlg').showModal()}
+$('#f').onsubmit=e=>{if(e.submitter&&e.submitter.value!=='ok')return;const o={};for(const el of $('#f').elements)if(el.name)o[el.name]=el.value.trim();
+ if(!o.nama)return;if(cur)Object.assign(DB.siswa.find(x=>x.id===cur),o);else DB.siswa.push({id:uid(),...o});save();render()};
+$('#hapus').onclick=()=>{if(confirm('Hapus siswa ini beserta seluruh data absennya?')){DB.siswa=DB.siswa.filter(x=>x.id!==cur);for(const t in DB.abs){delete DB.abs[t][cur];if(!Object.keys(DB.abs[t]).length)delete DB.abs[t]}save();$('#dlg').close();render()}};
+// rekap
+$('#jr').onchange=()=>{$('#wb').classList.toggle('hide',$('#jr').value!=='bln');$('#ws').classList.toggle('hide',$('#jr').value!=='sem');rRekap()};
+$('#bln').onchange=$('#sem').onchange=rRekap;
+const cnt=(sid,pred)=>{const c={H:0,S:0,I:0,A:0};for(const t in DB.abs)if(pred(t)){const v=DB.abs[t][sid];if(v)c[v]++}return c};
+const pct=c=>{const n=c.H+c.S+c.I+c.A;return n?Math.round(c.H/n*1000)/10:0};
+function rekapData(){ // returns {title, cols[], rows[][] , html rows}
+ const jr=$('#jr').value,S=DB.siswa;
+ if(jr==='bln'){const [y,m]=$('#bln').value.split('-').map(Number);if(!y)return null;const n=new Date(y,m,0).getDate();
+  const days=[...Array(n)].map((_,i)=>i+1);const ym=$('#bln').value;
+  const hd=['No','Nama',...days,'H','S','I','A','%H'];
+  const rows=S.map((s,i)=>{const c=cnt(s.id,t=>t.startsWith(ym));return [i+1,s.nama,...days.map(d=>(DB.abs[ym+'-'+String(d).padStart(2,'0')]||{})[s.id]||''),c.H,c.S,c.I,c.A,pct(c)+'%']});
+  return {title:`Rekap Absensi ${BLN[m-1]} ${y}`,hd,rows,days:n,dates:days.map(d=>ym+'-'+String(d).padStart(2,'0'))}}
+ const ta=DB.set.ta.split('/')[0]||String(new Date().getFullYear());const y1=+ta,y2=y1+1;
+ const mons=jr==='sem'?($('#sem').value==='1'?[[y1,7],[y1,8],[y1,9],[y1,10],[y1,11],[y1,12]]:[[y2,1],[y2,2],[y2,3],[y2,4],[y2,5],[y2,6]]):[[y1,7],[y1,8],[y1,9],[y1,10],[y1,11],[y1,12],[y2,1],[y2,2],[y2,3],[y2,4],[y2,5],[y2,6]];
+ const key=([y,m])=>y+'-'+String(m).padStart(2,'0');
+ const hd=['No','Nama',...mons.map(([y,m])=>BLN[m-1].slice(0,3)+' (H)'),'H','S','I','A','Hari efektif','%H'];
+ const rows=S.map((s,i)=>{const per=mons.map(mm=>cnt(s.id,t=>t.startsWith(key(mm))).H);const c=cnt(s.id,t=>mons.some(mm=>t.startsWith(key(mm))));return [i+1,s.nama,...per,c.H,c.S,c.I,c.A,c.H+c.S+c.I+c.A,pct(c)+'%']});
+ return {title:jr==='sem'?`Rekap Absensi Semester ${$('#sem').value} TA ${DB.set.ta}`:`Rekap Absensi Tahun Ajaran ${DB.set.ta}`,hd,rows}}
+function rRekap(){const R=rekapData();if(!R||!DB.siswa.length){$('#rekap').innerHTML='<div class="empty">Tidak ada data.</div>';return}
+ const sk=R.dates?R.dates.map(t=>new Date(t+'T00:00').getDay()===0?' off':''):[];
+ let h=`<b>${esc(R.title)}</b><div style="color:var(--mu);margin-bottom:6px">${esc(DB.set.sek)} · Kelas ${esc(DB.set.kel)}</div><table><tr>${R.hd.map(x=>`<th>${x}</th>`).join('')}</tr>`;
+ h+=R.rows.map(r=>'<tr>'+r.map((x,i)=>{const dayCol=R.dates&&i>=2&&i<2+R.days;return `<td class="${i===1?'l':''} ${dayCol?(x||'')+(sk[i-2]||''):''}">${esc(x)}</td>`}).join('')+'</tr>').join('')+'</table>';
+ if(R.dates){const tot={H:0,S:0,I:0,A:0};R.rows.forEach(r=>{tot.H+=r[2+R.days];tot.S+=r[3+R.days];tot.I+=r[4+R.days];tot.A+=r[5+R.days]});h+=`<p>Total: Hadir ${tot.H} · Sakit ${tot.S} · Izin ${tot.I} · Alpa ${tot.A}. Kolom abu-abu = hari Minggu.</p>`}
+ $('#rekap').innerHTML=h}
+function csv(rows){return '﻿'+rows.map(r=>r.map(x=>'"'+String(x??'').replace(/"/g,'""')+'"').join(',')).join('\r\n')}
+function saveFile(name,mime,text){if(window.Android&&Android.saveFile){Android.saveFile(name,mime,text);return}
+ const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([text],{type:mime}));a.download=name;document.body.append(a);a.click();a.remove()}
+$('#csvRekap').onclick=()=>{const R=rekapData();if(!R)return;saveFile(R.title.replace(/\s+/g,'_')+'.csv','text/csv',csv([[R.title],[DB.set.sek+' - Kelas '+DB.set.kel],[],R.hd,...R.rows]))};
+
+function siswaData(){return {title:'Data Siswa Kelas '+DB.set.kel+' TA '+DB.set.ta,hd:['No','NIS','NISN','Nama','JK','Agama','Tempat Lahir','Tanggal Lahir','Alamat','Ayah','Ibu','Pekerjaan Ortu','No HP','Catatan'],rows:DB.siswa.map((s,i)=>[i+1,s.nis||'',s.nisn||'',s.nama,s.jk,s.agama||'',s.tmp||'',s.tgllhr||'',s.alamat||'',s.ayah||'',s.ibu||'',s.kerja||'',s.hp||'',s.cat||''])}}
+const fname=R=>R.title.replace(/[^\w]+/g,'_');
+function htmlDoc(R,forWord){const s=DB.set;
+ const ttd=`<table style="border:0;width:100%;margin-top:28px"><tr><td style="border:0;text-align:center;width:50%">Mengetahui,<br>Kepala Sekolah<br><br><br><br><u>${esc(s.kep)}</u><br>NIP. ${esc(s.nipk)}</td><td style="border:0;text-align:center">Guru Kelas<br><br><br><br><br><u>${esc(s.guru)}</u><br>NIP. ${esc(s.nip)}</td></tr></table>`;
+ return `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word"><head><meta charset="utf-8"><title>${esc(R.title)}</title>${forWord?'<!--[if gte mso 9]><xml><w:WordDocument><w:View>Print</w:View></w:WordDocument></xml><![endif]-->':''}<style>@page{size:A4 landscape;margin:12mm}body{font:11px Arial}table{border-collapse:collapse;width:100%}th,td{border:1px solid #444;padding:2px 3px;text-align:center}th{background:#e6ebf5}td.l{text-align:left}</style></head><body><h3 style="text-align:center;margin:0">${esc(R.title).toUpperCase()}</h3><p style="text-align:center;margin:2px 0 8px">${esc(s.sek)} - Kelas ${esc(s.kel)}</p><table><tr>${R.hd.map(x=>`<th>${esc(x)}</th>`).join('')}</tr>${R.rows.map(r=>'<tr>'+r.map((x,i)=>`<td class="${(i===1&&!R.siswa)||(R.siswa&&(i===3||i===8))?'l':''}">${esc(x)}</td>`).join('')+'</tr>').join('')}</table>${ttd}</body></html>`}
+function doPrint(R){const w=htmlDoc(R,false);if(window.Android&&Android.printHtml){Android.printHtml(w)}else{const f=window.open('','_blank');if(f){f.document.write(w);f.document.close();f.focus();f.print()}else toast('Izinkan pop-up untuk mencetak')}}
+function doWord(R){saveFile(fname(R)+'.doc','application/msword',htmlDoc(R,true))}
+// ---- xlsx tanpa pustaka (zip tanpa kompresi)
+const CRC=(()=>{const t=[];for(let n=0;n<256;n++){let c=n;for(let k=0;k<8;k++)c=c&1?0xEDB88320^(c>>>1):c>>>1;t[n]=c>>>0}return t})();
+const crc32=u=>{let c=0xFFFFFFFF;for(const b of u)c=CRC[(c^b)&255]^(c>>>8);return(c^0xFFFFFFFF)>>>0};
+function zip(files){const enc=new TextEncoder(),parts=[],cen=[];let off=0;
+ const w32=(a,v)=>a.push(v&255,v>>>8&255,v>>>16&255,v>>>24&255),w16=(a,v)=>a.push(v&255,v>>>8&255);
+ for(const [name,txt] of files){const nb=enc.encode(name),d=enc.encode(txt),c=crc32(d);
+  const h=[];w32(h,0x04034b50);w16(h,20);w16(h,0x0800);w16(h,0);w16(h,0);w16(h,0x21);w32(h,c);w32(h,d.length);w32(h,d.length);w16(h,nb.length);w16(h,0);
+  parts.push(new Uint8Array(h),nb,d);
+  const e=[];w32(e,0x02014b50);w16(e,20);w16(e,20);w16(e,0x0800);w16(e,0);w16(e,0);w16(e,0x21);w32(e,c);w32(e,d.length);w32(e,d.length);w16(e,nb.length);w16(e,0);w16(e,0);w16(e,0);w16(e,0);w32(e,0);w32(e,off);
+  cen.push(new Uint8Array(e),nb);off+=h.length+nb.length+d.length}
+ let cs=0;cen.forEach(x=>cs+=x.length);const z=[];w32(z,0x06054b50);w16(z,0);w16(z,0);w16(z,files.length);w16(z,files.length);w32(z,cs);w32(z,off);w16(z,0);
+ const all=[...parts,...cen,new Uint8Array(z)];let n=0;all.forEach(x=>n+=x.length);const out=new Uint8Array(n);let o=0;all.forEach(x=>{out.set(x,o);o+=x.length});return out}
+const colL=i=>{let s='';i++;while(i>0){const m=(i-1)%26;s=String.fromCharCode(65+m)+s;i=Math.floor((i-1)/26)}return s};
+const xe=t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])).replace(/[\x00-\x08\x0b\x0c\x0e-\x1f]/g,'');
+function xlsx(R){const s=DB.set,top=[R.title.toUpperCase(),s.sek+' - Kelas '+s.kel],nc=R.hd.length;let rows='';
+ top.forEach((t,i)=>rows+=`<row r="${i+1}"><c r="A${i+1}" s="3" t="inlineStr"><is><t>${xe(t)}</t></is></c></row>`);
+ const row=(r,n,st)=>`<row r="${n}">`+r.map((v,i)=>{const ref=colL(i)+n;return typeof v==='number'?`<c r="${ref}" s="${st}"><v>${v}</v></c>`:`<c r="${ref}" s="${st}" t="inlineStr"><is><t xml:space="preserve">${xe(v)}</t></is></c>`}).join('')+'</row>';
+ rows+=row(R.hd,4,1);R.rows.forEach((r,i)=>rows+=row(r,5+i,2));
+ const widths=R.hd.map((h,i)=>{let m=String(h).length;R.rows.forEach(r=>m=Math.max(m,String(r[i]).length));return Math.min(Math.max(m+2,4),42)});
+ const cols='<cols>'+widths.map((w,i)=>`<col min="${i+1}" max="${i+1}" width="${w}" customWidth="1"/>`).join('')+'</cols>';
+ const last=5+R.rows.length+1;
+ const sig=[[last+1,'Mengetahui, Kepala Sekolah','Guru Kelas'],[last+5,s.kep,s.guru],[last+6,'NIP. '+s.nipk,'NIP. '+s.nip]];
+ const mid=Math.max(3,Math.ceil(nc/2));let sg='';
+ sig.forEach(([n,a,b])=>sg+=`<row r="${n}"><c r="A${n}" t="inlineStr"><is><t>${xe(a)}</t></is></c><c r="${colL(mid)}${n}" t="inlineStr"><is><t>${xe(b)}</t></is></c></row>`);
+ const sheet=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><sheetPr><pageSetUpPr fitToPage="1"/></sheetPr><sheetViews><sheetView workbookViewId="0"><pane ySplit="4" topLeftCell="A5" activePane="bottomLeft" state="frozen"/></sheetView></sheetViews>${cols}<sheetData>${rows}${sg}</sheetData><pageMargins left="0.4" right="0.4" top="0.5" bottom="0.5" header="0.3" footer="0.3"/><pageSetup paperSize="9" orientation="landscape" fitToWidth="1" fitToHeight="0"/></worksheet>`;
+ const styles=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><fonts count="2"><font><sz val="11"/><name val="Calibri"/></font><font><b/><sz val="11"/><name val="Calibri"/></font></fonts><fills count="3"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill><fill><patternFill patternType="solid"><fgColor rgb="FFD9E2F3"/></patternFill></fill></fills><borders count="2"><border><left/><right/><top/><bottom/><diagonal/></border><border><left style="thin"/><right style="thin"/><top style="thin"/><bottom style="thin"/><diagonal/></border></borders><cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs><cellXfs count="4"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/><xf numFmtId="0" fontId="1" fillId="2" borderId="1" xfId="0" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center" wrapText="1"/></xf><xf numFmtId="0" fontId="0" fillId="0" borderId="1" xfId="0" applyBorder="1"/><xf numFmtId="0" fontId="1" fillId="0" borderId="0" xfId="0" applyFont="1"/></cellXfs><cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles></styleSheet>`;
+ const hdr='<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
+ return zip([['[Content_Types].xml',hdr+'<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/></Types>'],
+ ['_rels/.rels',hdr+'<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>'],
+ ['xl/workbook.xml',hdr+'<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets><sheet name="Rekap" sheetId="1" r:id="rId1"/></sheets></workbook>'],
+ ['xl/_rels/workbook.xml.rels',hdr+'<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>'],
+ ['xl/styles.xml',styles],['xl/worksheets/sheet1.xml',sheet]])}
+function saveBin(name,mime,u8){if(window.Android&&Android.saveBase64){let b='';for(let i=0;i<u8.length;i+=8192)b+=String.fromCharCode.apply(null,u8.subarray(i,i+8192));Android.saveBase64(name,mime,btoa(b));return}
+ const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([u8],{type:mime}));a.download=name;document.body.append(a);a.click();a.remove()}
+const doXls=R=>saveBin(fname(R)+'.xlsx','application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',xlsx(R));
+const rk=()=>{const R=rekapData();if(!R)toast('Tidak ada data');return R};
+$('#cetak').onclick=()=>{const R=rk();R&&doPrint(R)};
+$('#docRekap').onclick=()=>{const R=rk();R&&doWord(R)};
+$('#xlsRekap').onclick=()=>{const R=rk();R&&doXls(R)};
+const sd=()=>({...siswaData(),siswa:1});
+$('#cetakSiswa').onclick=()=>doPrint(sd());$('#docSiswa').onclick=()=>doWord(sd());$('#xlsSiswa').onclick=()=>doXls(sd());
+$('#csvSiswa').onclick=()=>{const R=siswaData();saveFile('Data_Siswa.csv','text/csv',csv([R.hd,...R.rows]))};
+// pengaturan
+function loadSet(){const s=DB.set;[['sSek','sek'],['sKel','kel'],['sTa','ta'],['sGuru','guru'],['sNip','nip'],['sKep','kep'],['sNipK','nipk']].forEach(([i,k])=>$('#'+i).value=s[k]||'')}
+$('#simpanSet').onclick=()=>{const s=DB.set;[['sSek','sek'],['sKel','kel'],['sTa','ta'],['sGuru','guru'],['sNip','nip'],['sKep','kep'],['sNipK','nipk']].forEach(([i,k])=>s[k]=$('#'+i).value.trim());save();head();toast('Tersimpan')};
+$('#bak').onclick=()=>saveFile('Cadangan_Absen_'+iso(new Date())+'.json','application/json',JSON.stringify(DB));
+$('#res').onclick=()=>$('#fres').click();
+$('#fres').onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const d=JSON.parse(r.result);if(!d.siswa||!d.abs)throw 0;if(confirm('Ganti semua data saat ini dengan cadangan?')){DB=d;save();render();toast('Data dipulihkan')}}catch(x){alert('File cadangan tidak valid')}};r.readAsText(f);e.target.value=''};
+render();
+</script></body></html>

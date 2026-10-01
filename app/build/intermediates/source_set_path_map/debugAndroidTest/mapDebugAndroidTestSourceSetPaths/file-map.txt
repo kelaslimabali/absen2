@@ -1,0 +1,4 @@
+id.sdn6sibetan.absen.test.app-androidTest-0 C:\Users\ADVAN\Desktop\baru absen\AbsenSiswa\AbsenSiswa\app\build\generated\res\resValues\androidTest\debug
+id.sdn6sibetan.absen.test.app-mergeDebugAndroidTestResources-1 C:\Users\ADVAN\Desktop\baru absen\AbsenSiswa\AbsenSiswa\app\build\intermediates\incremental\debugAndroidTest\mergeDebugAndroidTestResources\merged.dir
+id.sdn6sibetan.absen.test.app-mergeDebugAndroidTestResources-2 C:\Users\ADVAN\Desktop\baru absen\AbsenSiswa\AbsenSiswa\app\build\intermediates\incremental\debugAndroidTest\mergeDebugAndroidTestResources\stripped.dir
+id.sdn6sibetan.absen.test.app-debugAndroidTest-3 C:\Users\ADVAN\Desktop\baru absen\AbsenSiswa\AbsenSiswa\app\build\intermediates\merged_res\debugAndroidTest\mergeDebugAndroidTestResources
